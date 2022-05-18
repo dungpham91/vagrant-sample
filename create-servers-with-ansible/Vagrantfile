@@ -1,0 +1,79 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+	config.ssh.insert_key = false
+	config.vm.provider :virtualbox do |vb|
+		vb.memory = 512
+		vb.cpus = 1
+	end
+
+# ansible server
+	config.vm.define "ansible" do |ansible_config|
+		ENV["LC_ALL"] = "en_US.UTF-8"
+		ansible_config.vm.hostname = "ansible"
+		ansible_config.vm.box = "ubuntu/focal64"
+		ansible_config.vm.box_version = "20210311.0.0"
+		ansible_config.vm.network :private_network, ip: "192.168.33.10", :netmask => "255.255.255.0"
+		ansible_config.vm.synced_folder "/media/danie/DATA/VAGRANT/idp-cluster/ansible-data", "/home/ansible-data", type: "rsync"
+		ansible_config.vm.provision :hosts, :sync_hosts => true
+		ansible_config.vm.provision :host_shell do |host_shell|
+			host_shell.inline = 'scp -i ~/.vagrant.d/insecure_private_key -o "StrictHostKeyChecking no" ~/.vagrant.d/insecure_private_key vagrant@192.168.33.10:/home/vagrant/.ssh/id_rsa'
+		end
+		ansible_config.vm.provision "shell", inline: <<-SHELL
+			chmod 600 /home/vagrant/.ssh/id_rsa
+			timedatectl set-timezone Asia/Ho_Chi_Minh
+			apt update
+			apt install ansible -y
+		SHELL
+	end
+
+# mysql8 server
+	config.vm.define "mysql8" do |mysql8_config|
+		mysql8_config.vm.hostname = "mysql8"
+		mysql8_config.vm.box = "ubuntu/focal64"
+		mysql8_config.vm.box_version = "20210311.0.0"
+		mysql8_config.vm.network :private_network, ip: "192.168.33.11", :netmask => "255.255.255.0"
+		mysql8_config.vm.provision :hosts, :sync_hosts => true
+		mysql8_config.vm.provision "shell", inline: <<-SHELL
+			apt-get update
+		SHELL
+	end
+
+# nginx proxy server
+	config.vm.define "nginx" do |nginx_config|
+		nginx_config.vm.hostname = "nginx"
+		nginx_config.vm.box = "ubuntu/focal64"
+		nginx_config.vm.box_version = "20210311.0.0"
+		nginx_config.vm.network :private_network, ip: "192.168.33.12", :netmask => "255.255.255.0"
+		nginx_config.vm.provision :hosts, :sync_hosts => true
+		nginx_config.vm.provision "shell", inline: <<-SHELL
+			apt-get update
+		SHELL
+	end
+
+# keycloak server 01
+	config.vm.define "keycloak01" do |keycloak01_config|
+		keycloak01_config.vm.hostname = "keycloak01"
+		keycloak01_config.vm.box = "ubuntu/focal64"
+		keycloak01_config.vm.box_version = "20210311.0.0"
+		keycloak01_config.vm.network :private_network, ip: "192.168.33.13", :netmask => "255.255.255.0"
+		keycloak01_config.vm.provision :hosts, :sync_hosts => true
+		keycloak01_config.vm.provision "shell", inline: <<-SHELL
+			apt-get update
+		SHELL
+	end
+
+# keycloak server 02
+	config.vm.define "keycloak02" do |keycloak02_config|
+		keycloak02_config.vm.hostname = "keycloak02"
+		keycloak02_config.vm.box = "ubuntu/focal64"
+		keycloak02_config.vm.box_version = "20210311.0.0"
+		keycloak02_config.vm.network :private_network, ip: "192.168.33.14", :netmask => "255.255.255.0"
+		keycloak02_config.vm.provision :hosts, :sync_hosts => true
+		keycloak02_config.vm.provision "shell", inline: <<-SHELL
+			apt-get update
+		SHELL
+	end
+end

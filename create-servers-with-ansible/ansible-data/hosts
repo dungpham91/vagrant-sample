@@ -1,0 +1,9 @@
+[db]
+mysql8
+
+[lbc]
+nginx
+
+[idp]
+keycloak01
+keycloak02
