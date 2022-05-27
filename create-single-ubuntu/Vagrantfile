@@ -1,0 +1,17 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  # Use image box Ubuntu, current is 20.10
+  config.vm.box = "ubuntu/focal64"
+  # Change port 80 to other port that you want to access from host machine
+  config.vm.network "forwarded_port", guest: 80, host: 80
+  # Set a private IP address, you can access it from host machine with `ssh vagrant@192.168.33.10` instead of `vagrant ssh`.
+  # Make you work as a real case
+  config.vm.network "private_network", ip: "192.168.33.10", :netmask => "255.255.255.0"
+  # Set cpu, ram for vm
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = "1024"
+    vb.cpus = 1
+  end
+end
